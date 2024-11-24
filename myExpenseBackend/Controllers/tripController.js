@@ -85,3 +85,44 @@ exports.joinTrip = async (req, res) => {
     res.status(500).json({ message: "Error joining trip", error });
   }
 };
+
+exports.getAllUsernames = async (req, res) => {
+  const { tripId } = req.params; // Extract tripId from URL parameters
+
+  try {
+    // Find the trip by uniqueId
+    const trip = await Trip.findOne({ uniqueId: tripId });
+
+    if (!trip) {
+      return res.status(404).json({ error: "Trip not found" });
+    }
+
+    const { members } = trip; // Extract the members array
+
+    if (!members || members.length === 0) {
+      return res.status(404).json({ error: "No members found for this trip" });
+    }
+
+    // Fetch usernames and ids from the Users collection
+    const users = await User.find(
+      { _id: { $in: members } }, // Find users whose IDs match the `members` array
+      "_id username" // Fetch `_id` and `username` fields
+    );
+
+    if (!users || users.length === 0) {
+      return res.status(404).json({ error: "No users found for the given members" });
+    }
+
+    // Map each user to an object containing id and username
+    const userDetails = users.map((user) => ({
+      id: user._id,
+      username: user.username,
+    }));
+
+    // Send the associated usernames and ids as a response
+    res.status(200).json({ members: userDetails });
+  } catch (err) {
+    console.error("Error fetching usernames:", err.message);
+    res.status(500).json({ error: "Error fetching usernames" });
+  }
+};

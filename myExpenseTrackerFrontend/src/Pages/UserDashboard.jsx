@@ -11,10 +11,12 @@ import { DashboardLayout } from "@toolpad/core/DashboardLayout";
 import { useDemoRouter } from "@toolpad/core/internal";
 import { useNavigate } from "react-router-dom";
 import CreateForm from "../Components/CreateForm";
-import TripCard from "../Components/TripCard";
-import ChipsPopupForm2 from "../Components/ChipsPopupForm2";
-import { useAuth } from "../Auth/AuthProvider";
-import LogoutIcon from "@mui/icons-material/Logout";
+import TripCard from "../Components/TripCard"; // Ensure this is correctly imported
+import SplitExpenseForm from "../Components/SplitExpenseForm";
+import {useAuth} from "../Auth/AuthProvider"
+import LogoutIcon from '@mui/icons-material/Logout';
+import ChipsPopupForm2 from "../Components/ChipsPopupForm2"
+import { Link } from "react-router-dom";
 const demoTheme = createTheme({
   cssVariables: {
     colorSchemeSelector: "data-toolpad-color-scheme",
@@ -80,6 +82,7 @@ function DemoPageContent({ pathname }) {
                 marginBottom: "20px",
               }}
             >
+                <Link to={`/trip/${trip.uniqueId}`} style={{ textDecoration: "none" }}>
               <TripCard
                 photo="https://www.shutterstock.com/shutterstock/photos/1247506609/display_1500/stock-vector-cabriolet-car-with-people-diverse-group-of-men-and-women-enjoy-ride-and-music-happy-young-friends-1247506609.jpg"
                 tripName={trip.tripName}
@@ -87,6 +90,7 @@ function DemoPageContent({ pathname }) {
                 date={new Date(trip.date).toLocaleDateString()}
                 codeToCopy={trip.uniqueId}
               />
+              </Link>
             </Box>
           ))}
         </Box>
