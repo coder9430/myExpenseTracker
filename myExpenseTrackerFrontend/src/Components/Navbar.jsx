@@ -17,7 +17,6 @@ const Navbar = () => {
         variant="h3"
         sx={{
           fontWeight: "bold",
-          fontFamily: '"Great Vibes", cursive',
           backgroundImage: "linear-gradient(160deg, #0a6a9b 0%, #44b5ad 100%)",
           WebkitBackgroundClip: "text",
           color: "transparent",

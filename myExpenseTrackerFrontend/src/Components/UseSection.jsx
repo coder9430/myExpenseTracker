@@ -95,7 +95,6 @@ const UseSection = () => {
               fontWeight: 'bold',
               mb: 3,
               fontSize: { xs: '2.2rem', md: '3.4rem' },
-              fontFamily: '"Great Vibes", cursive',
               background:
                 'linear-gradient(160deg, #0a6a9b 0%, #44b5ad 100%)',
               WebkitBackgroundClip: 'text',
