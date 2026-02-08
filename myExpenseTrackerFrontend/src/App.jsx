@@ -52,9 +52,9 @@ function App() {
               }
             >
               {/* Nested Routes */}
-              <Route path=":userId" element={<DashboardContent />} />
-              <Route path="trip/:tripId" element={<TripContent />} />
-              <Route path="expenserequest" element={<ExpenseRequest />} />
+              <Route path=":userId" element={<ProtectedRoute><DashboardContent /></ProtectedRoute>} />
+              <Route path="trip/:tripId" element={<ProtectedRoute><TripContent /></ProtectedRoute>} />
+              <Route path="expenserequest" element={<ProtectedRoute><ExpenseRequest /></ProtectedRoute>} />
             </Route>
           </Routes>
         </AuthProvider>

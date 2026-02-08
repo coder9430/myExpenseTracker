@@ -1,32 +1,53 @@
 import * as React from "react";
 import { AppProvider } from "@toolpad/core/AppProvider";
 import { useTheme } from "@mui/material/styles";
-import { Box, TextField, Button, Typography, Card, Link } from "@mui/material"; // Import Link component
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Card,
+  Link,
+} from "@mui/material";
 import { useAuth } from "../Auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
-  const [message, setMessage] = React.useState(""); // State to hold success or error message
+  const theme = useTheme();
+  const navigate = useNavigate();
   const { login } = useAuth();
+  const apiUrl = import.meta.env.VITE_API_URL;
+
+  const [message, setMessage] = React.useState("");
   const [formData, setFormData] = React.useState({
     username: "",
     email: "",
     password: "",
-  }); // State to hold form data
-  const navigate = useNavigate();
-  const apiUrl = import.meta.env.VITE_API_URL;
+  });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
+    setFormData((prev) => ({
+      ...prev,
       [name]: value,
     }));
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+
     const { username, email, password } = formData;
+
+    // 🔍 Frontend validation
+    if (!username || !email || !password) {
+      setMessage("All fields are required");
+      return;
+    }
+
+    if (password.length < 6) {
+      setMessage("Password must be at least 6 characters long");
+      return;
+    }
 
     try {
       const response = await fetch(`${apiUrl}/api/auth/register`, {
@@ -37,27 +58,22 @@ const SignUp = () => {
 
       const data = await response.json();
 
-      if (response.ok) {
-        setMessage("Account created successfully!"); // Show success message
-        login(data.token, data.userId);
-        navigate(`/dashboard/${data.userId}`);
-        setFormData({ username: "", email: "", password: "" }); // Clear form
-      } else {
-        // If the error message indicates that the email is already in use
-        if (data.error && data.error.includes("Email already in use")) {
-          setMessage(
-            "Account already exists. Please log in or use a different email."
-          );
-        } else {
-          setMessage(`Error: ${data.error}`);
-        }
+      if (!response.ok) {
+        setMessage(data.error || "Signup failed");
+        return;
       }
+
+      // ✅ CORRECT JWT STORAGE (NO COOKIES)
+      login(data.token, data.userId);
+
+      setMessage("Account created successfully!");
+      setFormData({ username: "", email: "", password: "" });
+
+      navigate(`/dashboard/${data.userId}`);
     } catch (error) {
-      setMessage("Something went wrong. Please try again."); // Show generic error message
+      setMessage("Something went wrong. Please try again.");
     }
   };
-
-  const theme = useTheme();
 
   return (
     <AppProvider theme={theme}>
@@ -73,7 +89,7 @@ const SignUp = () => {
       >
         <Box
           component="form"
-          onSubmit={handleSubmit}
+          onSubmit={handleSignUp}
           sx={{
             display: "flex",
             flexDirection: "column",
@@ -81,9 +97,8 @@ const SignUp = () => {
             gap: 2,
           }}
         >
-          <Typography variant="h4" component="h1" gutterBottom>
-            Sign Up
-          </Typography>
+          <Typography variant="h4">Sign Up</Typography>
+
           <TextField
             name="email"
             label="Email"
@@ -93,15 +108,16 @@ const SignUp = () => {
             onChange={handleInputChange}
             required
           />
+
           <TextField
             name="username"
             label="Username"
-            type="text"
             fullWidth
             value={formData.username}
             onChange={handleInputChange}
             required
           />
+
           <TextField
             name="password"
             label="Password"
@@ -111,20 +127,17 @@ const SignUp = () => {
             onChange={handleInputChange}
             required
           />
-          <Button type="submit" variant="contained" color="primary" fullWidth>
+
+          <Button type="submit" variant="contained" fullWidth>
             Sign Up
           </Button>
 
-          {/* Display success or error message */}
           {message && (
             <Typography
               variant="body2"
               sx={{
                 mt: 2,
-                color:
-                  message.includes("Error") || message.includes("already")
-                    ? "red"
-                    : "green",
+                color: message.includes("success") ? "green" : "red",
               }}
             >
               {message}

@@ -15,7 +15,10 @@ const TripDetails = () => {
   useEffect(() => {
     const fetchTrips = async () => {
       try {
-        const response = await fetch(`${apiUrl}/trip/user/${userId}`);
+        const token = localStorage.getItem("token"); // Retrieve the JWT token from storage
+        const response = await fetch(`${apiUrl}/trip/user/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         if (!response.ok) {
           throw new Error("Failed to fetch trips");
         }

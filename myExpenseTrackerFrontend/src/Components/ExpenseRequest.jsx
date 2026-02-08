@@ -43,9 +43,13 @@ function ExpenseRequest() {
   const fetchExpenseRequests = async () => {
     setLoading(true);
     try {
+      const token = localStorage.getItem("token"); // Retrieve the JWT token from storage
       const response = await fetch(`${apiUrl}/expense/requests/${userId}`, {
         method: "GET",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!response.ok) {

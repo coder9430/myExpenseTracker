@@ -35,10 +35,12 @@ export default function CreateTripForm({ open, onClose }) {
     formJson.date = selectedDate ? selectedDate.toISOString() : null; // Convert to ISO format for consistency
 
     try {
+      const token = localStorage.getItem("token"); // Retrieve the JWT token from storage
       const response = await fetch(`${apiUrl}/trip/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Include the token in the Authorization header
         },
         body: JSON.stringify(formJson),
       });

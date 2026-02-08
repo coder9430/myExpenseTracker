@@ -45,8 +45,11 @@ export default function SplitExpenseForm({ open, onClose }) {
   };
 
   const fetchAllCategory = () => {
+    const token = localStorage.getItem("token"); // Retrieve the JWT token from storage 
     setLoading(true);
-    fetch(`${apiUrl}/trip/allcategory/${tripId}`) // Replace with your API endpoint
+    fetch(`${apiUrl}/trip/allcategory/${tripId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    }) // Replace with your API endpoint
       .then((response) => {
         if (!response.ok) {
           throw new Error("Failed to fetch usernames");

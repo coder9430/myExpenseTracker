@@ -12,9 +12,10 @@ const UpiForm = ({ open, onClose }) => {
     const fetchUpiId = async () => {
       try {
         const userId = localStorage.getItem("userId");
+        const token = localStorage.getItem("token"); // Retrieve the JWT token from storage
         const response = await fetch(`${apiUrl}/api/auth/user/upi/${userId}`, {
           method: "GET",  // Use GET method to fetch UPI ID
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         });
         if (response.ok) {
           const data = await response.json();

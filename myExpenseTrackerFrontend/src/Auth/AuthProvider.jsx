@@ -1,72 +1,68 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import CircularProgress from '@mui/material/CircularProgress';
-import Box from '@mui/material/Box';
+import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
 
 // Create the Auth Context
-const AuthContext = createContext();
+const AuthContext = createContext(null);
 
 // AuthProvider component
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true); // Add a loading state
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // 🔐 PART 4 — AUTO LOGIN ON REFRESH
   useEffect(() => {
-    const token = localStorage.getItem("token"); // Check for token in localStorage
+    const token = localStorage.getItem("token");
 
-    if (token) {
+    if (token && token !== "undefined") {
       setIsAuthenticated(true);
     } else {
+      localStorage.removeItem("token");
+      localStorage.removeItem("userId");
       setIsAuthenticated(false);
     }
-    setLoading(false); // Set loading to false once the check is complete
+
+    setLoading(false);
   }, []);
 
-  // Function to log in
+  // ✅ LOGIN — stores token + userId
   const login = (token, userId) => {
-    localStorage.setItem("token", token); // Save token to localStorage
+    localStorage.setItem("token", token);
     localStorage.setItem("userId", userId);
     setIsAuthenticated(true);
   };
 
-  // Function to log out
+  // 🔐 PART 5 — LOGOUT
   const logout = () => {
-    localStorage.removeItem("token"); // Remove token from localStorage
-    localStorage.removeItem("userId"); // Remove userId from localStorage
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
     setIsAuthenticated(false);
-    navigate("/login"); // Redirect to login page
+    navigate("/login", { replace: true });
   };
 
-  // Show a loading spinner while determining authentication status
+  // Loader while checking auth
   if (loading) {
     return (
       <Box
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '100vh',
-          background: 'linear-gradient(135deg, #2196f3, #21cbf3)',
-          color: '#fff',
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+          background: "linear-gradient(135deg, #2196f3, #21cbf3)",
+          color: "#fff",
         }}
       >
-        <CircularProgress
-          size={80}
-          thickness={5}
-          sx={{
-            color: '#fff',
-            mb: 2, // Add some margin below the spinner
-          }}
-        />
+        <CircularProgress size={80} thickness={5} sx={{ color: "#fff", mb: 2 }} />
         <Box
           component="h1"
           sx={{
-            fontSize: '1.5rem',
-            textAlign: 'center',
-            fontWeight: 'bold',
-            textShadow: '1px 1px 5px rgba(0, 0, 0, 0.3)',
+            fontSize: "1.5rem",
+            fontWeight: "bold",
+            textShadow: "1px 1px 5px rgba(0,0,0,0.3)",
           }}
         >
           Loading, please wait...
@@ -74,7 +70,6 @@ export const AuthProvider = ({ children }) => {
       </Box>
     );
   }
-  
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
@@ -83,5 +78,5 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Custom hook to access AuthContext
+// Custom hook
 export const useAuth = () => useContext(AuthContext);

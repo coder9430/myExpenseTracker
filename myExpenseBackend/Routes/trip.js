@@ -8,15 +8,16 @@ const {
   getAllCategory,
   addNewCategory,
 } = require("../Controllers/tripController");
+const authMiddleware = require("../Middleware/authMiddleware");
 
 // Route to create a new trip
-router.post("/create", createTrip);
+router.post("/create",authMiddleware, createTrip);
 
 // Route to fetch trips for a specific user
-router.get("/user/:userId", getUserTrips);
-router.get("/allusernames/:tripId", getAllUsernames);
-router.get("/allcategory/:tripId", getAllCategory);
-router.post("/addnewcategory", addNewCategory);
-router.post("/join", joinTrip);
+router.get("/user/:userId",authMiddleware, getUserTrips);
+router.get("/allusernames/:tripId",authMiddleware, getAllUsernames);
+router.get("/allcategory/:tripId",authMiddleware, getAllCategory);
+router.post("/addnewcategory",authMiddleware, addNewCategory);
+router.post("/join",authMiddleware, joinTrip);
 
 module.exports = router;

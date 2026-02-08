@@ -30,9 +30,10 @@ const JoinTrip = ({ open, onClose }) => {
   const handleJoinTrip = async () => {
     const userId = localStorage.getItem("userId");
     try {
+      const token = localStorage.getItem("token"); // Retrieve the JWT token from storage 
       const response = await fetch(`${apiUrl}/trip/join`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ tripCode, userId }),
       });
 

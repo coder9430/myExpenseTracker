@@ -12,19 +12,20 @@ const {
   getTotalExpense,
   removeExpense
 } = require("../Controllers/expenseController");
+const authMiddleware = require("../Middleware/authMiddleware");
 
 // Route to create a new expense entry
-router.post("/create", saveExpense);
+router.post("/create",authMiddleware, saveExpense);
 
 // Route to get all expense requests for a specific user
-router.get("/requests/:userId", getExpensesRequestByUser);
+router.get("/requests/:userId",authMiddleware, getExpensesRequestByUser);
 
 // Route to get expenses for a specific trip and user
-router.get("/:tripId/:userId", getExpensesByTripAndUser);
-router.get("/totalexpense/:tripId/:userId", getTotalExpense);
-router.delete("/removeexpense/:id",removeExpense);
+router.get("/:tripId/:userId",authMiddleware, getExpensesByTripAndUser);
+router.get("/totalexpense/:tripId/:userId",authMiddleware, getTotalExpense);
+router.delete("/removeexpense/:id",authMiddleware, removeExpense);
 // Route to save an expense request
-router.post("/request", saveExpenseRequest);
-router.post("/markAllPaid", saveMarkExpensesPaid);
+router.post("/request",authMiddleware, saveExpenseRequest);
+router.post("/markAllPaid",authMiddleware, saveMarkExpensesPaid);
 
 module.exports = router;

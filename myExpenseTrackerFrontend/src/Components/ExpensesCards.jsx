@@ -41,11 +41,12 @@ function ExpensesCards() {
 
   const deleteExpense = async (tripId, userId, expenseId) => {
     try {
+      const token = localStorage.getItem("token"); // Retrieve the JWT token from storage
       const response = await fetch(
         `${apiUrl}/expense/removeexpense/${expenseId}`,
         {
           method: "DELETE",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
           body: JSON.stringify({ userId: userId, tripId: tripId }),
         },
       );

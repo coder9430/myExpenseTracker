@@ -1,18 +1,30 @@
 import React, { useState } from "react";
-import { Box, TextField, Button, Typography } from "@mui/material";
-import Card from "@mui/material/Card";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import { Box, TextField, Button, Typography, Card, Link } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Auth/AuthProvider";
 
 const SignIn = () => {
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
-  const navigate = useNavigate(); // Initialize useNavigate hook
+
+  const navigate = useNavigate();
   const { login } = useAuth();
   const apiUrl = import.meta.env.VITE_API_URL;
 
-  const signIn = async (formData) => {
-    const { email, password } = Object.fromEntries(formData.entries());
+  // ✅ Single handler (same pattern as SignUp)
+  const handleSignIn = async (event) => {
+    event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
+    const email = formData.get("email");
+    const password = formData.get("password");
+
+    // 🔍 Frontend validation
+    if (!email || !password) {
+      setMessage("All fields are required");
+      setMessageType("error");
+      return;
+    }
 
     try {
       const response = await fetch(`${apiUrl}/api/auth/login`, {
@@ -23,41 +35,43 @@ const SignIn = () => {
 
       const data = await response.json();
 
-      if (response.ok) {
-        setMessage("Login successful!");
-        setMessageType("success");
-        login(data.token, data.userId);
-
-        // Redirect to the user's dashboard with their ID
-        navigate(`/dashboard/${data.userId}`);
-      } else {
-        setMessage(`Error: ${data.error}`);
+      if (!response.ok) {
+        setMessage(data.error || "Login failed");
         setMessageType("error");
+        return;
       }
+
+      // 🔐 JWT login
+      login(data.token, data.userId);
+
+      setMessage("Login successful!");
+      setMessageType("success");
+
+      navigate(`/dashboard/${data.userId}`);
     } catch (error) {
       setMessage("Something went wrong. Please try again.");
       setMessageType("error");
     }
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    signIn(formData);
-  };
-
   return (
-    <Card sx={{ maxWidth: 400, margin: "auto", padding: 3, marginTop: 10 }}>
+    <Card sx={{ maxWidth: 400, margin: "auto", p: 3, mt: 10 }}>
       <Box
         component="form"
-        onSubmit={handleSubmit}
+        onSubmit={handleSignIn}
         sx={{ display: "flex", flexDirection: "column", gap: 2 }}
       >
-        <Typography variant="h4" component="h1" align="center" gutterBottom>
+        <Typography variant="h4" align="center">
           Sign In
         </Typography>
 
-        <TextField name="email" label="Email" type="email" fullWidth required />
+        <TextField
+          name="email"
+          label="Email"
+          type="email"
+          fullWidth
+          required
+        />
 
         <TextField
           name="password"
@@ -67,40 +81,34 @@ const SignIn = () => {
           required
         />
 
-        <Button type="submit" variant="contained" color="primary" fullWidth>
+        <Button type="submit" variant="contained" fullWidth>
           Sign In
         </Button>
 
-        {/* Display message */}
+        {/* Message */}
         {message && (
-          <div
-            style={{
-              padding: "10px",
-              backgroundColor: messageType === "success" ? "green" : "red",
-              color: "white",
-              marginTop: "10px",
-              borderRadius: "5px",
+          <Typography
+            sx={{
+              mt: 1,
+              textAlign: "center",
+              color: messageType === "success" ? "green" : "red",
             }}
           >
             {message}
-          </div>
+          </Typography>
         )}
 
-        {/* Link to sign up if no account */}
-        <Typography variant="body2" align="center" sx={{ marginTop: 2 }}>
-          Don't have an account?{" "}
-          <a href="/signup" style={{ textDecoration: "none", color: "blue" }}>
+        <Typography variant="body2" align="center" sx={{ mt: 2 }}>
+          Don’t have an account?{" "}
+          <Link href="/signup" underline="hover">
             Sign Up
-          </a>
+          </Link>
         </Typography>
 
-        <Typography variant="body2" align="center" sx={{ marginTop: 1 }}>
-          <a
-            href="/forgot-password"
-            style={{ textDecoration: "none", color: "#1976d2" }}
-          >
+        <Typography variant="body2" align="center">
+          <Link href="/forgot-password" underline="hover">
             Forgot Password?
-          </a>
+          </Link>
         </Typography>
       </Box>
     </Card>
